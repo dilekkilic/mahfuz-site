@@ -432,14 +432,72 @@ photoInput.addEventListener("change", function(){
 
 });
 
-function startAnalysis(){
+async function startAnalysis(){
+
+      const file = photoInput.files[0];
+
+          if(!file){
+                  alert("Lütfen önce bir eser fotoğrafı yükleyin.");
+                          return;
+                              }
+
+                                  const reader = new FileReader();
+
+                                      reader.onload = async function(){
+
+                                              const imageData = reader.result;
+
+                                                      try{
+
+                                                                  alert("MAHFUZ DEĞERLE motoru çalışıyor. Eser analiz ediliyor...");
+
+                                                                              const response = await fetch(
+                                                                                              "https://script.google.com/macros/s/AKfycby0JlAuwtENnJ6TkSSbZo8wsugxUcikz7mYxbBASpwyp9ScxQsRSPR96uDMJjyj72OAzQ/EXECUTIVE",
+                                                                                                              {
+                                                                                                                                  method: "POST",
+                                                                                                                                                      headers: {
+                                                                                                                                                                              "Content-Type": "application/json"
+                                                                                                                                                                                                  },
+                                                                                                                                                                                                                      body: JSON.stringify({
+                                                                                                                                                                                                                                              image: imageData
+                                                                                                                                                                                                                                                                  })
+                                                                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                                                                              );
+
+                                                                                                                                                                                                                                                                                                          const result = await response.json();
+
+                                                                                                                                                                                                                                                                                                                      console.log(result);
+
+                                                                                                                                                                                                                                                                                                                                  if(result.success){
+
+                                                                                                                                                                                                                                                                                                                                                  alert("Analiz tamamlandı.");
+
+                                                                                                                                                                                                                                                                                                                                                              }else{
+
+                                                                                                                                                                                                                                                                                                                                                                              alert("Analiz sırasında hata oluştu:\n" + (result.error || "Bilinmeyen hata"));
+
+                                                                                                                                                                                                                                                                                                                                                                                          }
+
+                                                                                                                                                                                                                                                                                                                                                                                                  }catch(error){
+
+                                                                                                                                                                                                                                                                                                                                                                                                              console.error(error);
+
+                                                                                                                                                                                                                                                                                                                                                                                                                          alert("Sunucuya bağlanılamadı.\n\n" + error.message);
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                  }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                      };
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                          reader.readAsDataURL(file);
+                                                                                                                                                                                                                                                                                                                                                                                                                                          } ip
+
 
   alert(
     "MAHFUZ DEĞERLE motoru hazırlanıyor. " +
     "Bir sonraki aşamada yapay zekâ ve piyasa araştırması bağlanacak."
   );
 
-}
+
 
 </script>
 
