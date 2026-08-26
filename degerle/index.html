@@ -41,6 +41,7 @@ const preview=document.getElementById("preview");
 const previewImage=document.getElementById("previewImage");
 const analyzeBtn=document.getElementById("analyzeBtn");
 const statusBox=document.getElementById("status");
+const API_URL="https://script.google.com/macros/s/AKfycby0JlAuwtENnJ6TkSSbZo8wsugxUcikz7mYxbBASpwyp9ScxQsRSPR96uDMJjyj72OAzQ/exec";
 
 photoInput.addEventListener("change",function(){
   const file=this.files[0];
@@ -64,36 +65,22 @@ async function startAnalysis(){
   statusBox.textContent="MAHFUZ DEĞERLE motoru çalışıyor. Eser analiz ediliyor...";
   try{
     const imageData=await readFileAsDataURL(file);
-    const response=await fetch("https://script.google.com/macros/s/AKfycby0JlAuwtENnJ6TkSSbZo8wsugxUcikz7mYxbBASpwyp9ScxQsRSPR96uDMJjyj72OAzQ/EXECUTIVE",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({image:imageData})
-    });
+    const response=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify({image:imageData})});
+    if(!response.ok) throw new Error("Sunucu HTTP "+response.status+" yanıtı verdi.");
     const text=await response.text();
     let result;
     try{result=JSON.parse(text);}catch(e){throw new Error("Sunucudan geçerli JSON yanıtı alınamadı.");}
-    if(result.success){
-      statusBox.textContent="Analiz tamamlandı. Sonuç servisten alındı.";
-    }else{
-      throw new Error(result.error||"Bilinmeyen analiz hatası");
-    }
+    if(result.success){statusBox.textContent="Analiz tamamlandı. Sonuç servisten alındı.";}
+    else{throw new Error(result.error||"Bilinmeyen analiz hatası");}
   }catch(error){
     console.error(error);
-    statusBox.textContent="Analiz sırasında bağlantı hatası oluştu: "+error.message;
+    statusBox.textContent="Sunucuya bağlanılamadı: "+error.message;
   }finally{
     analyzeBtn.disabled=false;
     analyzeBtn.textContent="ÜRÜNÜ İNCELE";
   }
 }
-
-function readFileAsDataURL(file){
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>resolve(reader.result);
-    reader.onerror=()=>reject(new Error("Fotoğraf okunamadı."));
-    reader.readAsDataURL(file);
-  });
-}
+function readFileAsDataURL(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error("Fotoğraf okunamadı."));reader.readAsDataURL(file);});}
 </script>
 </body>
 </html>
